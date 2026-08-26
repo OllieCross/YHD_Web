@@ -1,0 +1,32 @@
+# secrets
+.env
+.env.*.local
+
+# generated site output (produced by the sync container each run) —
+# keep only the mountpoint directories a fresh clone needs, via .gitkeep
+site/*
+!site/.gitkeep
+!site/css/
+site/css/*
+!site/css/.gitkeep
+!site/js/
+site/js/*
+!site/js/.gitkeep
+!site/assets/
+site/assets/*
+!site/assets/.gitkeep
+
+# sync runtime artifacts
+**/.bookmark-cache.json
+**/.media-cache.json
+**/.index.html.tmp
+
+# dependencies
+node_modules/
+
+# os / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

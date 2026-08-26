@@ -1,0 +1,28 @@
+# Production override — deployed to linux-srv-1:~/srv/yhd_web/docker-compose.override.yml
+# docker compose auto-loads it; exposes the site via Traefik at yhd.olliecross.com
+# the server's Docker daemon runs with userns-remap; keep host mapping like
+# the other stacks so bind-mount ownership lines up
+services:
+  sync:
+    userns_mode: "host"
+  web:
+    userns_mode: "host"
+    networks:
+      - default
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.yhd.rule=Host(`yhd.olliecross.com`)
+      - traefik.http.routers.yhd.entrypoints=websecure
+      - traefik.http.routers.yhd.tls.certresolver=letsencrypt
+      - traefik.http.services.yhd.loadbalancer.server.port=8080
+      # HSTS — scoped to this router only, does not touch other *.olliecross.com sites
+      - traefik.http.routers.yhd.middlewares=yhd-hsts
+      - traefik.http.middlewares.yhd-hsts.headers.stsSeconds=31536000
+      - traefik.http.middlewares.yhd-hsts.headers.stsIncludeSubdomains=false
+      - traefik.http.middlewares.yhd-hsts.headers.stsPreload=false
+
+networks:
+  proxy:
+    external: true

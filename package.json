@@ -1,0 +1,20 @@
+{
+  "name": "yhd-web",
+  "version": "1.0.0",
+  "description": "Locally-hosted, Notion-synced info page for the YHD NYE work trip, styled as a Notion dark/light page.",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "lint": "npm run lint:js && npm run lint:css",
+    "lint:js": "eslint .",
+    "lint:css": "stylelint \"css/**/*.css\"",
+    "lint:fix": "eslint . --fix && stylelint \"css/**/*.css\" --fix"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "eslint": "^9.13.0",
+    "globals": "^15.11.0",
+    "stylelint": "^16.10.0",
+    "stylelint-config-standard": "^36.0.1"
+  }
+}

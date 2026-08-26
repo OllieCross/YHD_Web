@@ -1,0 +1,10 @@
+# Nothing in this repo builds a Docker image from the root context — the
+# only build (sync/) has its own .dockerignore. Kept here as a safety net
+# in case that ever changes.
+.git
+.github
+node_modules
+site
+deploy
+*.md
+.env*
