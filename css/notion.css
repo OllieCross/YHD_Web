@@ -462,6 +462,62 @@ table.ndb tbody tr { transition: background var(--t-fast) var(--ease); }
 table.ndb tbody tr:hover td { background: var(--row-hover); }
 table.ndb tbody tr:hover td:first-child { background: #1d1d1d; }
 
+/* Mobile row-collapse chevron: present in the DOM at all viewport widths
+   (app.js doesn't check media queries), so it must be explicitly hidden and
+   sized here — an unsized inline <svg> falls back to the browser's default
+   SVG replacement size (~300x150px) and, sitting inside a real <td>, that
+   inflates the whole table row's height even on desktop. */
+table.ndb .row-chevron { display: none; }
+table.ndb .row-chevron svg { width: 10px; height: 10px; fill: currentColor; }
+
+/* Mobile: collapse each row to just its first cell (name); tapping it
+   expands the rest as a stacked label/value card. Wired up by app.js,
+   which tags every non-first cell with data-label and a click handler. */
+@media (max-width: 600px) {
+  .db-wrap::before, .db-wrap::after { display: none; }
+  .db-scroll { overflow-x: visible; }
+  table.ndb { display: block; width: 100%; }
+  table.ndb thead { display: none; }
+  table.ndb tbody { display: block; width: 100%; }
+  table.ndb tr {
+    display: block;
+    width: 100%;
+    border: 1px solid var(--table-border);
+    border-radius: 6px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+  table.ndb tr:first-child { margin-top: 0; }
+  table.ndb td {
+    display: none;
+    width: 100%; max-width: none; min-width: 0;
+    box-sizing: border-box;
+    border: none; border-top: 1px solid var(--table-border);
+    white-space: normal; overflow: visible; text-overflow: clip;
+  }
+  table.ndb td:first-child {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    position: static;
+    border-top: none;
+    cursor: pointer;
+  }
+  table.ndb tr.expanded td { display: block; }
+  table.ndb tr.expanded td:first-child { display: flex; }
+  table.ndb td:not(:first-child)::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 12px; color: var(--fg-muted);
+    margin-bottom: 2px;
+  }
+  table.ndb .row-chevron {
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0; width: 16px; height: 16px;
+    color: var(--fg-muted);
+  }
+  table.ndb .row-chevron svg { transition: transform var(--t-med) var(--ease); }
+  table.ndb tr.expanded td:first-child .row-chevron svg { transform: rotate(90deg); }
+}
+
 .cb {
   display: inline-block; width: 14px; height: 14px;
   border: 1.4px solid var(--fg-muted); border-radius: 3px;
@@ -484,6 +540,12 @@ table.ndb td.tags {
   white-space: normal;
   overflow: visible; text-overflow: clip;
   max-width: 280px;
+}
+/* mobile card layout: this cell fills the row like every other cell —
+   the desktop max-width above would otherwise win on specificity and
+   pinch tag cells (e.g. Gruppe) narrower than their siblings */
+@media (max-width: 600px) {
+  table.ndb td.tags { max-width: none; }
 }
 /* Notion select/status option colors (synced from the API) */
 .tag.n-default { background: rgba(255, 255, 255, 0.094); color: var(--fg); }

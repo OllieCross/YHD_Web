@@ -206,6 +206,7 @@
         tbl.appendChild(tbody);
         skel.remove();
         tbl.style.display = "";
+        setupCollapsibleTable(tbl);
         updateShadows(scroll);
       })
       .catch(function () {
@@ -235,6 +236,41 @@
     wrap.classList.toggle("shadow-l", scroll.scrollLeft > 4);
     wrap.classList.toggle("shadow-r", max > 4 && scroll.scrollLeft < max - 4);
   }
+
+  /* ---------- mobile table collapse ----------
+     On phones each row shows only its first cell (name); tapping it expands
+     the rest, stacked as label/value pairs (CSS gates the visuals to
+     max-width: 600px — this just wires the data/handlers, harmless on desktop). */
+  var CHEVRON_SVG = '<span class="row-chevron"><svg viewBox="0 0 12 12"><path d="M3 1.5l6 4.5-6 4.5z"/></svg></span>';
+  function setupCollapsibleTable(tbl) {
+    var headCells = tbl.querySelectorAll("thead th");
+    if (!headCells.length) return;
+    var labels = Array.prototype.map.call(headCells, function (th) { return th.textContent; });
+    tbl.querySelectorAll("tbody tr").forEach(function (tr) {
+      if (tr.dataset.collapsible) return;
+      tr.dataset.collapsible = "1";
+      var cells = tr.querySelectorAll("td");
+      cells.forEach(function (td, i) {
+        if (i === 0) return;
+        if (labels[i]) td.dataset.label = labels[i];
+      });
+      var first = cells[0];
+      if (!first) return;
+      first.insertAdjacentHTML("beforeend", CHEVRON_SVG);
+      first.setAttribute("role", "button");
+      first.setAttribute("tabindex", "0");
+      first.setAttribute("aria-expanded", "false");
+      var toggle = function () {
+        var open = tr.classList.toggle("expanded");
+        first.setAttribute("aria-expanded", open ? "true" : "false");
+      };
+      first.addEventListener("click", toggle);
+      first.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
+      });
+    });
+  }
+  document.querySelectorAll("table.ndb").forEach(setupCollapsibleTable);
 
   document.querySelectorAll(".db-scroll").forEach(function (scroll) {
     var wrap = document.createElement("div");
